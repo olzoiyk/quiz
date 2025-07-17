@@ -2,26 +2,27 @@ const questions = [
     {
         question: "What is the capital of France?",
         answers: [
-            { text: "Berlin", correct: false },
-            { text: "Madrid", correct: false },
             { text: "Paris", correct: true },
-            { text: "Rome", correct: false }
+            { text: "London", correct: false },
+            { text: "Berlin", correct: false },
+            { text: "Madrid", correct: false }
         ]
     },
     {
-        question: "Which planet is known as the Red Planet?",
+        question: "Which language runs in a web browser?",
         answers: [
-            { text: "Earth", correct: false },
-            { text: "Mars", correct: true },
-            { text: "Jupiter", correct: false },
-            { text: "Saturn", correct: false }
+            { text: "Java", correct: false },
+            { text: "C", correct: false },
+            { text: "Python", correct: false },
+            { text: "JavaScript", correct: true }
         ]
     }
+    // Add more questions here if you want
 ];
 
-const questionText = document.getElementById("question-text");
+const questionElement = document.getElementById("question");
 const answerButtons = document.getElementById("answer-buttons");
-const nextButton = document.getElementById("next-button");
+const nextButton = document.getElementById("next-btn");
 
 let currentQuestionIndex = 0;
 let score = 0;
@@ -29,21 +30,22 @@ let score = 0;
 function startQuiz() {
     currentQuestionIndex = 0;
     score = 0;
-    nextButton.innerHTML = "Next";
+    nextButton.innerText = "Next";
     showQuestion();
 }
 
 function showQuestion() {
     resetState();
-    let currentQuestion = questions[currentQuestionIndex];
-    questionText.innerHTML = currentQuestion.question;
+
+    const currentQuestion = questions[currentQuestionIndex];
+    questionElement.innerText = currentQuestion.question;
 
     currentQuestion.answers.forEach(answer => {
         const button = document.createElement("button");
-        button.innerHTML = answer.text;
+        button.innerText = answer.text;
         button.classList.add("btn");
         if (answer.correct) {
-            button.dataset.correct = true;
+            button.dataset.correct = answer.correct;
         }
         button.addEventListener("click", selectAnswer);
         answerButtons.appendChild(button);
@@ -60,39 +62,47 @@ function resetState() {
 function selectAnswer(e) {
     const selectedBtn = e.target;
     const isCorrect = selectedBtn.dataset.correct === "true";
+
     if (isCorrect) {
-        selectedBtn.classList.add("correct");
+        selectedBtn.style.backgroundColor = "#8794CEFF";
         score++;
     } else {
-        selectedBtn.classList.add("incorrect");
+        selectedBtn.style.backgroundColor = "#f44336";
     }
 
     Array.from(answerButtons.children).forEach(button => {
         button.disabled = true;
         if (button.dataset.correct === "true") {
-            button.classList.add("correct");
+            button.style.backgroundColor = "#4CAF50";
         }
     });
 
     nextButton.style.display = "block";
 }
 
-nextButton.addEventListener("click", () => {
+function showScore() {
+    resetState();
+    questionElement.innerText = `You scored ${score} out of ${questions.length}!`;
+    nextButton.innerText = "Play Again";
+    nextButton.style.display = "block";
+}
+
+function handleNextButton() {
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
         showQuestion();
     } else {
         showScore();
     }
-});
-
-function showScore() {
-    resetState();
-    questionText.innerHTML = `You scored ${score} out of ${questions.length}!`;
-    nextButton.innerHTML = "Play Again";
-    nextButton.style.display = "block";
-    nextButton.addEventListener("click", startQuiz);
 }
 
-// Start the quiz on page load
+nextButton.addEventListener("click", () => {
+    if (currentQuestionIndex < questions.length) {
+        handleNextButton();
+    } else {
+        startQuiz();
+    }
+});
+
+// Start the quiz
 startQuiz();
